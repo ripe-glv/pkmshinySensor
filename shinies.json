@@ -1,0 +1,212 @@
+[
+    {
+        "nome": "serperior",
+        "id": "497",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/497.png"
+    },
+    {
+        "nome": "druddigon",
+        "id": "621",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/621.png"
+    },
+    {
+        "nome": "zangoose",
+        "id": "335",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/335.png"
+    },
+    {
+        "nome": "meowth",
+        "id": "52",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/52.png"
+    },
+    {
+        "nome": "hatenna",
+        "id": "856",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/856.png"
+    },
+    {
+        "nome": "nidoran-f",
+        "id": "29",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/29.png"
+    },
+    {
+        "nome": "lechonk",
+        "id": "915",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/915.png"
+    },
+    {
+        "nome": "aipom",
+        "id": "190",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/190.png"
+    },
+    {
+        "nome": "phantump",
+        "id": "708",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/708.png"
+    },
+    {
+        "nome": "fomantis",
+        "id": "753",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/753.png"
+    },
+    {
+        "nome": "moltres",
+        "id": "146",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/146.png"
+    },
+    {
+        "nome": "exploud",
+        "id": "295",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/295.png"
+    },
+    {
+        "nome": "mienfoo",
+        "id": "619",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/619.png"
+    },
+    {
+        "nome": "sableye",
+        "id": "302",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/302.png"
+    },
+    {
+        "nome": "beldum",
+        "id": "374",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/374.png"
+    },
+    {
+        "nome": "braixen",
+        "id": "654",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/654.png"
+    },
+    {
+        "nome": "iron-jugulis",
+        "id": "993",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/993.png"
+    },
+    {
+        "nome": "primeape",
+        "id": "57",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/57.png"
+    },
+    {
+        "nome": "seel",
+        "id": "86",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/86.png"
+    },
+    {
+        "nome": "walking-wake",
+        "id": "1009",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1009.png"
+    },
+    {
+        "nome": "raikou",
+        "id": "243",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/243.png"
+    },
+    {
+        "nome": "doublade",
+        "id": "680",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/680.png"
+    },
+    {
+        "nome": "vibrava",
+        "id": "329",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/329.png"
+    },
+    {
+        "nome": "armaldo",
+        "id": "348",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/348.png"
+    },
+    {
+        "nome": "glimmora",
+        "id": "970",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/970.png"
+    },
+    {
+        "nome": "nidorino",
+        "id": "33",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/33.png"
+    },
+    {
+        "nome": "volcanion",
+        "id": "721",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/721.png"
+    },
+    {
+        "nome": "audino",
+        "id": "531",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/531.png"
+    },
+    {
+        "nome": "oricorio-baile",
+        "id": "741",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/741.png"
+    },
+    {
+        "nome": "lileep",
+        "id": "345",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/345.png"
+    },
+    {
+        "nome": "mothim",
+        "id": "414",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/414.png"
+    },
+    {
+        "nome": "servine",
+        "id": "496",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/496.png"
+    },
+    {
+        "nome": "meowscarada",
+        "id": "908",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/908.png"
+    },
+    {
+        "nome": "kirlia",
+        "id": "281",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/281.png"
+    },
+    {
+        "nome": "seismitoad",
+        "id": "537",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/537.png"
+    },
+    {
+        "nome": "servine",
+        "id": "496",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/496.png"
+    },
+    {
+        "nome": "lunatone",
+        "id": "337",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/337.png"
+    },
+    {
+        "nome": "riolu",
+        "id": "447",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/447.png"
+    },
+    {
+        "nome": "durant",
+        "id": "632",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/632.png"
+    },
+    {
+        "nome": "minccino",
+        "id": "572",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/572.png"
+    },
+    {
+        "nome": "chinchou",
+        "id": "170",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/170.png"
+    },
+    {
+        "nome": "bronzong",
+        "id": "437",
+        "imagem": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/437.png"
+    }
+]
