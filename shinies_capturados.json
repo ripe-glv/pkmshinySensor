@@ -1,0 +1,12 @@
+[
+    {
+        "nome": "simisage",
+        "id": "512",
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/512.png"
+    },
+    {
+        "nome": "wobbuffet",
+        "id": "202",
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/202.png"
+    }
+]

@@ -33,7 +33,7 @@ print("Gerador iniciado...")
 
 while True:
     codigo = random.randint(1, 1010)
-    is_shiny = random.random() < 0.01 
+    is_shiny = random.random() < 0.01
     pokemon = buscar_nome_pokemon(codigo, is_shiny)
     pacote = {
         "id": codigo,

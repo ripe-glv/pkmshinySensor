@@ -1,46 +1,26 @@
-import socket
-import json
-import threading
+import subprocess
+import sys
+import time
+import os
 
-UDP_PORT = 5000 
-TCP_PORT = 6000
-HOST = '127.0.0.1'
-
-def tratar_atuador(conn, addr):
-    print(f" Atuador conectado em: {addr}")
-    conn.send(b"Aguardando Shinies...\n")
-
-    return conn
-
-def iniciar_backend():
-
-    sock_gerador = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock_gerador.bind((HOST, UDP_PORT))
-
-    sock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_tcp.bind((HOST, TCP_PORT))
-    sock_tcp.listen(1)
+def iniciar_projeto():
+    print("Iniciando Sistema Pokémon...")
     
-    print(f"Backend ouvindo Gerador (UDP:{UDP_PORT}) e Atuador (TCP:{TCP_PORT})...")
+    python_exe = sys.executable
 
-    conn_atuador, addr_atuador = sock_tcp.accept()
+    backend = subprocess.Popen([python_exe, "backend.py"])
+    time.sleep(2)
+
+    atuador = subprocess.Popen([python_exe, "atuador.py"])
+
+    gerador = subprocess.Popen([python_exe, "sensor.py"])
+
+    print("Todos os módulos estão rodando.")
+
+    atuador.wait()
     
-    while True:
-        # Recebe dados do Gerador
-        data, addr = sock_gerador.recvfrom(1024)
-        pokemon = json.loads(data.decode())
-        
-        print(f"Recebido: {pokemon['nome']} (ID: {pokemon['id']})")
-
-        if pokemon['shiny']:
-            print("--- SHINY DETECTADO! ---")
-            msg_captura = f"{pokemon['nome']}|{pokemon['id']}|{pokemon['link_img']}\n"
-            try:
-                conn_atuador.send(msg_captura.encode())
-            except Exception as e:
-                print(e)
-                print("Erro ao falar com atuador. Reconectando...")
-                conn_atuador, addr_atuador = sock_tcp.accept()
+    backend.terminate()
+    gerador.terminate()
 
 if __name__ == "__main__":
-    iniciar_backend()
+    iniciar_projeto()
