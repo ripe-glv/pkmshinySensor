@@ -1,26 +1,64 @@
-import subprocess
+"""
+main.py
+───────
+Ponto de entrada do sistema completo.
+
+Sobe em background:
+  - servidor.py    (central)
+  - atuador/atuador.py  (como modulo)
+
+Abre a interface grafica (mvc/).
+"""
+
 import sys
+import threading
+import subprocess
 import time
-import os
 
-def iniciar_projeto():
-    print("Iniciando Sistema Pokémon...")
-    
-    python_exe = sys.executable
 
-    backend = subprocess.Popen([python_exe, "backend.py"])
-    time.sleep(2)
+def _subir(nome: str, args: list):
+    try:
+        proc = subprocess.Popen(
+            args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            bufsize=1,
+        )
+        for linha in proc.stdout:
+            print(f"[{nome}] {linha}", end="")
+        proc.wait()
+    except Exception as e:
+        print(f"[main] Erro ao iniciar {nome}: {e}")
 
-    atuador = subprocess.Popen([python_exe, "atuador.py"])
-
-    gerador = subprocess.Popen([python_exe, "sensor.py"])
-
-    print("Todos os módulos estão rodando.")
-
-    atuador.wait()
-    
-    backend.terminate()
-    gerador.terminate()
 
 if __name__ == "__main__":
-    iniciar_projeto()
+    # 1. servidor
+    threading.Thread(
+        target=_subir,
+        args=("servidor", [sys.executable, "-X", "utf8", "servidor.py"]),
+        daemon=True
+    ).start()
+
+    time.sleep(1.0)
+
+    # 2. atuador (processo separado)
+    threading.Thread(
+        target=_subir,
+        args=("atuador", [sys.executable, "-X", "utf8", "-m", "atuador.atuador"]),
+        daemon=True
+    ).start()
+
+    time.sleep(0.5)
+
+    # 3. interface
+    from mvc.model      import ShinyModel
+    from mvc.view       import AtuadorView
+    from mvc.controller import AtuadorController
+
+    model      = ShinyModel()
+    view       = AtuadorView()
+    controller = AtuadorController(model, view)
+    controller.iniciar()
+    view.mainloop()
