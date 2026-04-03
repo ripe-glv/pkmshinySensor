@@ -1,19 +1,27 @@
-# docker-compose.yml
-# ──────────────────
-# Lê configurações do arquivo .env na mesma pasta.
-# Copie .env.example para .env e ajuste SERVER_HOST antes de subir.
+# docker-compose.lab.yml
+# ──────────────────────
+# Uso no laboratório com 2 PCs físicos:
+#
+#   PC2 (servidor) — roda: servidor + atuador + sensores gen2 a gen9
+#     1. Descubra o IP do PC2: ip addr show | grep "inet " | grep -v 127
+#     2. Edite o .env: SERVER_HOST=<IP do PC2>
+#     3. docker compose -f docker-compose.lab.yml --profile servidor up --build
+#
+#   PC1 (sensor remoto) — roda: só sensor_gen1, aponta para PC2
+#     1. Copie o mesmo .env do PC2 para este PC
+#     2. docker compose -f docker-compose.lab.yml --profile sensor up --build
+#     3. Rode a GUI: python main_gui.py
 
 networks:
   shiny_net:
     driver: bridge
 
-volumes:
-  shinies_data:
-
 services:
 
-  # ── SERVIDOR ──────────────────────────────────────────────────────────────
+  # ── PC2 ──────────────────────────────────────────────────────────────────
+
   servidor:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.servidor
@@ -29,8 +37,8 @@ services:
       TCP_PORT: "${TCP_PORT:-6000}"
     restart: unless-stopped
 
-  # ── ATUADOR ───────────────────────────────────────────────────────────────
   atuador:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.atuador
@@ -44,23 +52,8 @@ services:
       - servidor
     restart: unless-stopped
 
-  # ── SENSORES ──────────────────────────────────────────────────────────────
-  sensor_gen1:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
-    container_name: shiny_sensor_gen1
-    networks:
-      - shiny_net
-    environment:
-      SERVER_HOST: "servidor"
-      UDP_SERVER_PORT: "${UDP_PORT:-5000}"
-      GEN: "1"
-    depends_on:
-      - servidor
-    restart: unless-stopped
-
   sensor_gen2:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -76,6 +69,7 @@ services:
     restart: unless-stopped
 
   sensor_gen3:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -91,6 +85,7 @@ services:
     restart: unless-stopped
 
   sensor_gen4:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -106,6 +101,7 @@ services:
     restart: unless-stopped
 
   sensor_gen5:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -121,6 +117,7 @@ services:
     restart: unless-stopped
 
   sensor_gen6:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -136,6 +133,7 @@ services:
     restart: unless-stopped
 
   sensor_gen7:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -151,6 +149,7 @@ services:
     restart: unless-stopped
 
   sensor_gen8:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -166,6 +165,7 @@ services:
     restart: unless-stopped
 
   sensor_gen9:
+    profiles: [servidor]
     build:
       context: .
       dockerfile: Dockerfile.sensor
@@ -178,4 +178,19 @@ services:
       GEN: "9"
     depends_on:
       - servidor
+    restart: unless-stopped
+
+  # ── PC1 ──────────────────────────────────────────────────────────────────
+
+  sensor_gen1:
+    profiles: [sensor]
+    build:
+      context: .
+      dockerfile: Dockerfile.sensor
+    container_name: shiny_sensor_gen1
+    network_mode: host
+    environment:
+      SERVER_HOST: "${SERVER_HOST:-localhost}"
+      UDP_SERVER_PORT: "${UDP_PORT:-5000}"
+      GEN: "1"
     restart: unless-stopped

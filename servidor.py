@@ -6,15 +6,18 @@ Backend central do sistema Shiny Detector.
 Escuta UMA porta UDP (todos os sensores enviam para cá).
 Aceita múltiplos atuadores via TCP.
 Propaga o campo `gen` no protocolo para que o atuador diferencie sensores.
+
+Em Docker: usa variáveis de ambiente BIND_HOST, UDP_PORT, TCP_PORT.
 """
 
 import socket
 import json
 import threading
+import os
 
-UDP_PORT = 5000
-TCP_PORT = 6000
-HOST     = "127.0.0.1"
+UDP_PORT = int(os.environ.get("UDP_PORT", 5000))
+TCP_PORT = int(os.environ.get("TCP_PORT", 6000))
+HOST     = os.environ.get("BIND_HOST", "0.0.0.0")   # 0.0.0.0 para aceitar conexões externas no Docker
 
 lock      = threading.Lock()
 atuadores: list[socket.socket] = []
@@ -52,9 +55,8 @@ def notificar_atuadores(msg: str):
 
 
 def escutar_sensores():
-    """Thread única que recebe pacotes UDP de TODOS os sensores."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)   # ← fix: evita WinError 10048
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((HOST, UDP_PORT))
     print(f"[Servidor] Escutando sensores na porta UDP:{UDP_PORT}")
 
@@ -84,7 +86,7 @@ def escutar_sensores():
 def iniciar_backend():
     threading.Thread(target=registrar_atuador, daemon=True).start()
     threading.Thread(target=escutar_sensores,  daemon=True).start()
-    print(f"[Servidor] Rodando | UDP:{UDP_PORT} | TCP:{TCP_PORT}")
+    print(f"[Servidor] Rodando | UDP:{UDP_PORT} | TCP:{TCP_PORT} | HOST:{HOST}")
     threading.Event().wait()
 
 

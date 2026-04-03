@@ -4,9 +4,9 @@ atuador/sensores.py
 Fonte única de verdade sobre as gerações Pokémon.
 Também pode ser executado diretamente como sensor individual:
 
-    python -m atuador.sensores <numero_da_geracao>
+    python -m sensores <numero_da_geracao>
 
-Importado por: mvc/model.py, mvc/controller.py, servidor.py
+Em Docker: usa variáveis de ambiente SERVER_HOST e UDP_SERVER_PORT.
 """
 
 import sys
@@ -15,8 +15,11 @@ import random
 import time
 import socket
 import urllib.request
+import os
 
-HOST = "127.0.0.1"
+# Em Docker, SERVER_HOST aponta para o nome do serviço do servidor
+HOST            = os.environ.get("SERVER_HOST", "127.0.0.1")
+UDP_SERVER_PORT = int(os.environ.get("UDP_SERVER_PORT", 5000))
 
 GERACOES: dict[int, dict] = {
     1: {"nome": "Geração I",    "regiao": "Kanto",  "range": (1,   151), "porta": 6001},
@@ -29,9 +32,6 @@ GERACOES: dict[int, dict] = {
     8: {"nome": "Geração VIII", "regiao": "Galar",  "range": (810, 905), "porta": 6008},
     9: {"nome": "Geração IX",   "regiao": "Paldea", "range": (906,1025), "porta": 6009},
 }
-
-# Porta UDP do servidor (única — todas as gerações enviam para cá)
-UDP_SERVER_PORT = 5000
 
 API_BASE_URL = "https://pokeapi.co/api/v2/pokemon/"
 
@@ -73,10 +73,11 @@ def rodar_sensor(gen: int):
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print(f"[{sensor_id}] Iniciado — {info['nome']} ({info['regiao']}) — range #{lo}-#{hi}")
+    print(f"[{sensor_id}] Enviando para {HOST}:{UDP_SERVER_PORT}")
 
     while True:
         codigo = random.randint(lo, hi)
-        is_shiny = random.random() < 0.1   # 1% de chance
+        is_shiny = random.random() < 0.000244140625
 
         pkm = _buscar_pokemon(codigo, is_shiny)
         if pkm is None:
@@ -99,10 +100,9 @@ def rodar_sensor(gen: int):
         time.sleep(1)
 
 
-# ── execução direta ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Uso: python -m atuador.sensores <geracao>  (1-9)")
+        print("Uso: python -m sensores <geracao>  (1-9)")
         sys.exit(1)
     try:
         gen_num = int(sys.argv[1])

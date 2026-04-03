@@ -9,7 +9,7 @@ Importa GERACOES de atuador/sensores.py (fonte única de verdade).
 
 import json
 import os
-from atuador.sensores import GERACOES, detectar_gen
+from sensores import GERACOES, detectar_gen
 
 ARQUIVO = "shinies.json"
 
@@ -36,7 +36,6 @@ class ShinyModel:
 
     # ── escrita ───────────────────────────────────────────────────────────────
     def adicionar(self, nome: str, p_id: str, imagem: str) -> dict:
-        """Cria e persiste um novo shiny com todos os campos vazios."""
         item = {
             "nome": nome, "id": p_id, "imagem": imagem,
             "tipos": [], "altura": "", "peso": "", "descricao": "",
@@ -49,7 +48,6 @@ class ShinyModel:
         return item
 
     def atualizar_detalhes(self, p_id: str, detalhes: dict) -> bool:
-        """Atualiza campos extras de um shiny (PokeAPI, etc.)."""
         for item in self._dados:
             if str(item["id"]) == str(p_id):
                 item.update(detalhes)
@@ -58,7 +56,6 @@ class ShinyModel:
         return False
 
     def libertar(self, p_id: str) -> bool:
-        """Remove um shiny pelo ID. Retorna True se achou e removeu."""
         antes = len(self._dados)
         self._dados = [d for d in self._dados if str(d["id"]) != str(p_id)]
         if len(self._dados) < antes:

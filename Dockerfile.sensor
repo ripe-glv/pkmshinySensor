@@ -1,4 +1,6 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 WORKDIR /app
-COPY sensor.py .
-CMD ["python", "sensor.py"]
+COPY sensores.py .
+# GEN é obrigatório: define qual geração este container monitora (1-9)
+ENV GEN=1
+CMD ["sh", "-c", "python -u sensores.py $GEN"]

@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 WORKDIR /app
-COPY atuador.py .
-CMD ["python", "atuador.py"]
+COPY atuador_headless.py .
+CMD ["python", "-u", "atuador_headless.py"]
