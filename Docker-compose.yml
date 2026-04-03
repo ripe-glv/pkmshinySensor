@@ -7,16 +7,13 @@ networks:
   shiny_net:
     driver: bridge
 
-volumes:
-  shinies_data:
-
 services:
 
   # ── SERVIDOR ──────────────────────────────────────────────────────────────
   servidor:
     build:
       context: .
-      dockerfile: Dockerfile.servidor
+      dockerfile: docker/Dockerfile.servidor
     container_name: shiny_servidor
     networks:
       - shiny_net
@@ -33,13 +30,16 @@ services:
   atuador:
     build:
       context: .
-      dockerfile: Dockerfile.atuador
+      dockerfile: docker/Dockerfile.atuador
     container_name: shiny_atuador
     networks:
       - shiny_net
     environment:
       SERVER_HOST: "servidor"
       TCP_PORT: "${TCP_PORT:-6000}"
+      ARQUIVO: "/shinies.json"
+    volumes:
+      - ./shinies.json:/data/shinies.json
     depends_on:
       - servidor
     restart: unless-stopped
@@ -48,7 +48,7 @@ services:
   sensor_gen1:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen1
     networks:
       - shiny_net
@@ -63,7 +63,7 @@ services:
   sensor_gen2:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen2
     networks:
       - shiny_net
@@ -78,7 +78,7 @@ services:
   sensor_gen3:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen3
     networks:
       - shiny_net
@@ -93,7 +93,7 @@ services:
   sensor_gen4:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen4
     networks:
       - shiny_net
@@ -108,7 +108,7 @@ services:
   sensor_gen5:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen5
     networks:
       - shiny_net
@@ -123,7 +123,7 @@ services:
   sensor_gen6:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen6
     networks:
       - shiny_net
@@ -138,7 +138,7 @@ services:
   sensor_gen7:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen7
     networks:
       - shiny_net
@@ -153,7 +153,7 @@ services:
   sensor_gen8:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen8
     networks:
       - shiny_net
@@ -168,7 +168,7 @@ services:
   sensor_gen9:
     build:
       context: .
-      dockerfile: Dockerfile.sensor
+      dockerfile: docker/Dockerfile.sensor
     container_name: shiny_sensor_gen9
     networks:
       - shiny_net
