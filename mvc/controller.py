@@ -2,7 +2,7 @@
 mvc/controller.py
 ─────────────────
 Liga a View ao Model. Recebe eventos via processar() chamado pelo main_gui.py.
-Ao receber SHINY, recarrega o model do disco (o atuador já salvou no volume).
+Não sabe nada de sockets — a conexão TCP fica no main_gui.py.
 """
 
 from mvc.model import ShinyModel
@@ -14,7 +14,9 @@ class AtuadorController:
         self._model = model
         self._view  = view
         self.ativo  = True
-        self.view   = view
+
+        # expõe view para o main_gui.py acessar
+        self.view = view
 
         self._view.cb_ativar_sensor    = lambda gen: None
         self._view.cb_desativar_sensor = lambda gen: None
@@ -37,7 +39,8 @@ class AtuadorController:
         if dados is None:
             return
         gen = self._model.detectar_gen(p_id)
-        self._view.abrir_detalhes(dados, gen)
+        tipos = self._model.get_tipos(p_id)
+        self._view.abrir_detalhes(dados, gen, tipos)
 
     def _handle_libertar(self, p_id: str):
         nome = (self._model.get_por_id(p_id) or {}).get("nome", p_id)
@@ -46,33 +49,29 @@ class AtuadorController:
         if self._model.libertar(p_id):
             self._view.remover_card(p_id)
             self._view.set_total(self._model.total())
-            self._view.log(f"[↩] {nome} removido da view.")
+            self._view.log(f"[↩] {nome} foi libertado.")
 
     def _handle_fechar(self):
         self.ativo = False
         self._view.on_close()
 
-    # ── eventos TCP (chamado pelo main_gui.py) ────────────────────────────────
+    # ── processamento de eventos TCP (chamado pelo main_gui.py) ───────────────
 
     def processar(self, linha: str):
         partes = linha.split("|")
-        if len(partes) < 5:
+        if len(partes) < 7:
             return
 
-        tipo, nome, p_id, url, sensor_id = partes[:5]
-        gen = int(partes[5]) if len(partes) > 5 else 1
-
+        tipo, nome, p_id, url, sensor_id, gen, tipos = partes[:7]
+        gen = int(partes[5]) if len(partes) > 6 else 1
         if tipo == "APARECER":
-            self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen, s=sensor_id:
+            self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen, s=sensor_id, t=tipos:
                 self._view.atualizar_monitor_sensor(s, g, n, i, u, is_shiny=False))
 
         elif tipo == "SHINY":
-            # atuador já salvou no JSON — só recarrega e plota
-            self._model.recarregar()
-            dados = self._model.get_por_id(p_id)
-            self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen, s=sensor_id:
+            self._model.adicionar(nome, p_id, url, tipos)
+            self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen, s=sensor_id, t=tipos:
                 self._view.atualizar_monitor_sensor(s, g, n, i, u, is_shiny=True))
-            if dados:
-                self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen:
-                    self._view.adicionar_card_com_id(n, i, u, g))
+            self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen, t=tipos:
+                self._view.adicionar_card_com_id(n, i, u, g))
             self._view.after(0, lambda: self._view.set_total(self._model.total()))
