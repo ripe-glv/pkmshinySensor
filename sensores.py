@@ -59,7 +59,8 @@ def _buscar_pokemon(codigo: int, is_shiny: bool) -> dict | None:
         with urllib.request.urlopen(req, timeout=5) as resp:
             data = json.loads(resp.read().decode())
             sprite = data["sprites"]["front_shiny" if is_shiny else "front_default"]
-            return {"nome": data["name"], "link_img": sprite or ""}
+            tipos = [t["type"]["name"] for t in data["types"]]
+            return {"nome": data["name"], "link_img": sprite or "", "tipos": tipos}
     except Exception as e:
         print(f"[sensor] Erro na API para #{codigo}: {e}")
         return None
@@ -77,7 +78,7 @@ def rodar_sensor(gen: int):
 
     while True:
         codigo = random.randint(lo, hi)
-        is_shiny = random.random() < 0.000244140625
+        is_shiny = random.random() < 0.01
 
         pkm = _buscar_pokemon(codigo, is_shiny)
         if pkm is None:
@@ -91,6 +92,7 @@ def rodar_sensor(gen: int):
             "link_img":  pkm["link_img"],
             "sensor_id": sensor_id,
             "gen":       gen,
+            "tipos" :    pkm["tipos"],
         }
 
         sock.sendto(json.dumps(pacote).encode(), (HOST, UDP_SERVER_PORT))

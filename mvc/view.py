@@ -716,7 +716,7 @@ class AtuadorView(tk.Tk):
         if not self._todos_cards:
             self._empty_lbl.grid(row=0, column=0, pady=60)
 
-    def abrir_detalhes(self, dados: dict, gen: int):
+    def abrir_detalhes(self, dados: dict, gen: int, tipos: list[str]):
         cor = GEN_CORES.get(gen, ACCENT)
         self._det_titulo.configure(text=dados.get("nome", "").upper())
         self._det_id_lbl.configure(text=f"  #{dados.get('id', '')}")
@@ -727,9 +727,12 @@ class AtuadorView(tk.Tk):
 
         for w in self._det_tipos_row.winfo_children():
             w.destroy()
-        tipos = dados.get("tipos", [])
-        if tipos:
-            for t in tipos:
+        tipos_str = dados.get("tipos", "") 
+        
+        if tipos_str:
+            lista_tipos = tipos_str.split(";") 
+            
+            for t in lista_tipos:
                 tc = TYPE_CORES.get(t.lower(), BORDER)
                 tk.Label(self._det_tipos_row, text=t.upper(),
                          font=("Courier New", 8, "bold"), fg=BG, bg=tc, padx=6, pady=2

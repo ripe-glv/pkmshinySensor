@@ -73,12 +73,13 @@ def escutar_sensores():
         img       = pkm.get("link_img",  "")
         is_shiny  = pkm.get("shiny",     False)
         gen       = pkm.get("gen",       1)
+        tipos     = pkm.get("tipos",     [])
 
-        notificar_atuadores(f"APARECER|{nome}|{p_id}|{img}|{sensor_id}|{gen}\n")
+        notificar_atuadores(f"APARECER|{nome}|{p_id}|{img}|{sensor_id}|{gen}|{';'.join(tipos)}\n")
 
         if is_shiny:
             print(f"[{sensor_id}] ✨ SHINY: {nome}!")
-            notificar_atuadores(f"SHINY|{nome}|{p_id}|{img}|{sensor_id}|{gen}\n")
+            notificar_atuadores(f"SHINY|{nome}|{p_id}|{img}|{sensor_id}|{gen}|{';'.join(tipos)}\n")
         else:
             print(f"[{sensor_id}] {nome}")
 

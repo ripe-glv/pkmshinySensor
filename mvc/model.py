@@ -35,10 +35,10 @@ class ShinyModel:
             json.dump(self._dados, f, indent=4, ensure_ascii=False)
 
     # ── escrita ───────────────────────────────────────────────────────────────
-    def adicionar(self, nome: str, p_id: str, imagem: str) -> dict:
+    def adicionar(self, nome: str, p_id: str, imagem: str, tipos: list[str]) -> dict:
         item = {
             "nome": nome, "id": p_id, "imagem": imagem,
-            "tipos": [], "altura": "", "peso": "", "descricao": "",
+            "tipos": tipos, "altura": "", "peso": "", "descricao": "",
             "hp": "", "ataque": "", "defesa": "",
             "ataque_esp": "", "defesa_esp": "", "velocidade": "",
             "movimentos": [],
@@ -81,6 +81,12 @@ class ShinyModel:
             return detectar_gen(int(p_id))
         except (ValueError, TypeError):
             return 1
+
+    def get_tipos(self, p_id: str) -> list[str]:
+        item = self.get_por_id(p_id)
+        if item is not None:
+            return item.get("tipos", [])
+        return []
 
     def total(self) -> int:
         return len(self._dados)
