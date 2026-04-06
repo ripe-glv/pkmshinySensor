@@ -92,7 +92,6 @@ def rodar_sensor(gen: int):
             "link_img":  pkm["link_img"],
             "sensor_id": sensor_id,
             "gen":       gen,
-            "tipos" :    pkm["tipos"],
         }
 
         sock.sendto(json.dumps(pacote).encode(), (HOST, UDP_SERVER_PORT))

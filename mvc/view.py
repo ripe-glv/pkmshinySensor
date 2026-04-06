@@ -727,10 +727,14 @@ class AtuadorView(tk.Tk):
 
         for w in self._det_tipos_row.winfo_children():
             w.destroy()
-        tipos_str = dados.get("tipos", "") 
-        
-        if tipos_str:
-            lista_tipos = tipos_str.split(";") 
+        # tipos pode chegar como lista (do JSON) ou string separada por ";" (do TCP)
+        _tipos_raw = tipos if tipos is not None else dados.get("tipos", "")
+        if isinstance(_tipos_raw, list):
+            lista_tipos = _tipos_raw
+        else:
+            lista_tipos = [t for t in str(_tipos_raw).split(";") if t]
+
+        if lista_tipos:
             
             for t in lista_tipos:
                 tc = TYPE_CORES.get(t.lower(), BORDER)

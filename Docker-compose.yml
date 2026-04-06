@@ -7,9 +7,6 @@ networks:
   shiny_net:
     driver: bridge
 
-volumes:
-  shinies_data:
-
 services:
 
   # ── SERVIDOR ──────────────────────────────────────────────────────────────
@@ -40,6 +37,9 @@ services:
     environment:
       SERVER_HOST: "servidor"
       TCP_PORT: "${TCP_PORT:-6000}"
+      ARQUIVO: "/data/shinies.json"   # aponta para o volume
+    volumes:
+      - ./data:/data                  # bind mount — expõe o JSON ao host (GUI local)
     depends_on:
       - servidor
     restart: unless-stopped
