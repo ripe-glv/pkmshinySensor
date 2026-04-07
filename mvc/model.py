@@ -81,6 +81,7 @@ class ShinyModel:
 
     def total(self) -> int:
         return len(self._dados)
+     
 
     def libertar(self, p_id: str) -> bool:
         """Remove localmente da view — o JSON no volume não é alterado pela GUI."""

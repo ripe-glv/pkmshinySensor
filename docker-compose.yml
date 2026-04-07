@@ -44,6 +44,27 @@ services:
       - servidor
     restart: unless-stopped
 
+  gerenciador:
+    build:
+      context: .
+      dockerfile: dockerfile.gerenciador
+    container_name: shiny_gerenciador
+    networks:
+      - shiny_net
+    ports:
+      - "${CTRL_PORT:-7000}:${CTRL_PORT:-7000}/tcp"
+    environment:
+      SERVER_HOST:     "servidor"
+      TCP_PORT:        "${TCP_PORT:-6000}"
+      CTRL_PORT:       "${CTRL_PORT:-7000}"
+      COMPOSE_PROJECT: "${COMPOSE_PROJECT_NAME:-pkmshinysensor}"
+    volumes:
+      # Acesso ao Docker daemon do host para controlar containers irmãos
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - servidor
+    restart: unless-stopped
+
   # ── SENSORES ──────────────────────────────────────────────────────────────
   sensor_gen1:
     build:

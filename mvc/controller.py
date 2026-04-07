@@ -7,6 +7,8 @@ Ao receber SHINY, recarrega o model do disco (o atuador já salvou no volume).
 
 from mvc.model import ShinyModel
 from mvc.view  import AtuadorView
+import time
+import threading
 
 
 class AtuadorController:
@@ -56,32 +58,46 @@ class AtuadorController:
 
     # ── eventos TCP (chamado pelo main_gui.py) ────────────────────────────────
 
-    def processar(self, linha: str):
-        partes = linha.split("|")
-        if len(partes) < 5:   # mínimo: tipo|nome|id|url|sensor_id
-            return
 
-        tipo      = partes[0]
-        nome      = partes[1]
-        p_id      = partes[2]
-        url       = partes[3]
-        sensor_id = partes[4]
-        gen       = int(partes[5]) if len(partes) > 5 else 1
+    # ── eventos TCP (chamado pelo main_gui.py) ────────────────────────────────
 
-        if tipo == "APARECER":
-            self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen, s=sensor_id:
-                self._view.atualizar_monitor_sensor(s, g, n, i, u, is_shiny=False))
+    def processar(self, acao: str, nome: str, p_id: str, img: str, sensor_id: str, gen: int, tipos: list[str]):
+        """Processa os eventos vindos do TCP."""
+        
+        # O APARECER e a atualização do Monitor Ao Vivo já estão sendo 
+        # feitos de forma instantânea lá no main_gui.py.
 
-        elif tipo == "SHINY":
-            # o atuador_headless já persistiu no volume — só recarrega e plota
-            self._model.recarregar()
-            dados = self._model.get_por_id(p_id)
+        if acao == "SHINY":
+            # Cria uma rotina em background para esperar o atuador_headless
+            def _esperar_pokeapi_e_carregar():
+                tentativas = 0
+                dados = None
+                
+                # Tenta ler o JSON a cada 1 segundo (máximo de 10 tentativas)
+                while tentativas < 10:
+                    self._model.recarregar()
+                    dados = self._model.get_por_id(p_id)
+                    
+                    if dados:
+                        break # Achou! O headless terminou de salvar.
+                        
+                    time.sleep(1)
+                    tentativas += 1
 
-            self._view.after(0, lambda n=nome, i=p_id, u=url, g=gen, s=sensor_id:
-                self._view.atualizar_monitor_sensor(s, g, n, i, u, is_shiny=True))
+                # Se achou os dados completos, usa a imagem oficial, senão usa a do TCP
+                img_final = dados["imagem"] if dados else img
+                
+                # Adiciona o card na View de forma segura
+                self._view.after(0, lambda n=nome, i=p_id, u=img_final, g=gen:
+                    self._view.adicionar_card_com_id(n, i, u, g))
+                
+                # Atualiza o contador de capturas
+                self._view.after(0, lambda: self._view.set_total(self._model.total()))
+                
+                if dados:
+                    self._view.after(0, lambda: self._view.log(f"[✓] Dados da PokeAPI carregados para #{p_id}"))
+                else:
+                    self._view.after(0, lambda: self._view.log(f"[⚠] Timeout: O atuador_headless demorou muito para o #{p_id}"))
 
-            # usa dados do volume se disponível, senão usa o que veio pelo TCP
-            img_final = dados["imagem"] if dados else url
-            self._view.after(0, lambda n=nome, i=p_id, u=img_final, g=gen:
-                self._view.adicionar_card_com_id(n, i, u, g))
-            self._view.after(0, lambda: self._view.set_total(self._model.total()))
+            # Dispara a espera sem travar a interface
+            threading.Thread(target=_esperar_pokeapi_e_carregar, daemon=True).start()
