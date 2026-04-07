@@ -15,6 +15,7 @@ services:
       context: .
       dockerfile: Dockerfile.servidor
     container_name: shiny_servidor
+    profiles: ["pc_1"]
     networks:
       - shiny_net
     ports:
@@ -32,6 +33,7 @@ services:
       context: .
       dockerfile: Dockerfile.atuador
     container_name: shiny_atuador
+    profiles: ["pc_1"]
     networks:
       - shiny_net
     environment:
@@ -49,6 +51,7 @@ services:
       context: .
       dockerfile: dockerfile.gerenciador
     container_name: shiny_gerenciador
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     ports:
@@ -71,6 +74,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen1
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -86,6 +90,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen2
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -101,6 +106,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen3
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -116,6 +122,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen4
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -131,6 +138,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen5
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -146,6 +154,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen6
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -161,6 +170,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen7
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -176,6 +186,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen8
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
@@ -191,6 +202,7 @@ services:
       context: .
       dockerfile: Dockerfile.sensor
     container_name: shiny_sensor_gen9
+    profiles: ["pc_2"]
     networks:
       - shiny_net
     environment:
