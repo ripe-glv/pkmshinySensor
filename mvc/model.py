@@ -34,10 +34,10 @@ o host consiga ler o arquivo:
 import json
 import os
 from sensores import GERACOES, detectar_gen
+from pathlib import Path
 
-# Padrão local: ./data/shinies.json (acessível no host via bind mount)
-# Em Docker puro defina ARQUIVO=/data/shinies.json
-ARQUIVO = os.environ.get("ARQUIVO", "./data/shinies.json")
+BASE_DIR = Path(__file__).parent.parent
+ARQUIVO = BASE_DIR / "data" / "shinies.json"
 
 
 class ShinyModel:
