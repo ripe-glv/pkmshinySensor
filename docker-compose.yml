@@ -59,7 +59,7 @@ services:
     ports:
       - "${CTRL_PORT:-7000}:${CTRL_PORT:-7000}/tcp"
     environment:
-      SERVER_HOST:     "servidor"
+      SERVER_HOST:     "${SERVER_HOST:-servidor}"
       TCP_PORT:        "${TCP_PORT:-6000}"
       CTRL_PORT:       "${CTRL_PORT:-7000}"
       COMPOSE_PROJECT: "${COMPOSE_PROJECT_NAME:-pkmshinysensor}"
