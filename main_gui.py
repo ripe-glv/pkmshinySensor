@@ -7,7 +7,7 @@ Os containers (servidor, sensores, atuador) rodam independentemente.
 Lê configuração do .env na mesma pasta:
   SERVER_HOST   — IP do servidor         (padrão: localhost)
   TCP_PORT      — porta TCP              (padrão: 6000)
-  COMPOSE_FILE  — arquivo compose a usar (padrão: Docker-compose.yml)
+  COMPOSE_FILE  — arquivo compose a usar (padrão: docker-compose.yml)
   COMPOSE_DIR   — pasta do projeto       (padrão: pasta deste script)
 """
 
@@ -31,7 +31,7 @@ if _env_path.exists():
 SERVER_HOST  = os.environ.get("SERVER_HOST",  "localhost")
 TCP_PORT     = int(os.environ.get("TCP_PORT", 6000))
 COMPOSE_DIR  = os.environ.get("COMPOSE_DIR",  str(Path(__file__).parent))
-COMPOSE_FILE = os.environ.get("COMPOSE_FILE", "Docker-compose.yml")
+COMPOSE_FILE = os.environ.get("COMPOSE_FILE", "docker-compose.yml")
 
 from mvc.model      import ShinyModel
 from mvc.view       import AtuadorView
