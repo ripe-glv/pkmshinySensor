@@ -43,7 +43,9 @@ services:
     volumes:
       - ./data:/data                  # bind mount — expõe o JSON ao host (GUI local)
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   gerenciador:
@@ -65,7 +67,9 @@ services:
       # Acesso ao Docker daemon do host para controlar containers irmãos
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   # ── SENSORES ──────────────────────────────────────────────────────────────
@@ -82,7 +86,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "1"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen2:
@@ -98,7 +104,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "2"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen3:
@@ -114,7 +122,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "3"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen4:
@@ -130,7 +140,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "4"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen5:
@@ -146,7 +158,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "5"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen6:
@@ -162,7 +176,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "6"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen7:
@@ -178,7 +194,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "7"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen8:
@@ -194,7 +212,9 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "8"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
 
   sensor_gen9:
@@ -210,5 +230,7 @@ services:
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "9"
     depends_on:
-      - servidor
+      servidor:
+        condition: service_started
+        required: false
     restart: unless-stopped
