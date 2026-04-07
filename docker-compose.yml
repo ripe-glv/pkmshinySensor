@@ -37,7 +37,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       TCP_PORT: "${TCP_PORT:-6000}"
       ARQUIVO: "/data/shinies.json"   # aponta para o volume
     volumes:
@@ -82,7 +82,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "1"
     depends_on:
@@ -100,7 +100,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "2"
     depends_on:
@@ -118,7 +118,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "3"
     depends_on:
@@ -136,7 +136,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "4"
     depends_on:
@@ -154,7 +154,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "5"
     depends_on:
@@ -172,7 +172,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "6"
     depends_on:
@@ -190,7 +190,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "7"
     depends_on:
@@ -208,7 +208,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "8"
     depends_on:
@@ -226,7 +226,7 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "9"
     depends_on:
