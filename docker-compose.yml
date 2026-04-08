@@ -37,7 +37,7 @@ services:
       context: .
       dockerfile: Dockerfile.atuador
     container_name: shiny_atuador
-    profiles: ["pc_1"]
+    profiles: ["pc_1", "pc_2"]  # O atuador pode rodar em ambos os PCs
     networks:
       - shiny_net
     environment:
