@@ -1,7 +1,8 @@
-# docker-compose.yml
-# ──────────────────
-# Lê configurações do arquivo .env na mesma pasta.
-# Copie .env.example para .env e ajuste SERVER_HOST antes de subir.
+# ─────────────────────────────────────────────────────────────
+# ARQUIVO MESTRE - SHINY DETECTOR
+# Único arquivo para ambos os PCs. O que define o papel da máquina
+# é a flag --profile usada no comando de subida.
+# ─────────────────────────────────────────────────────────────
 
 networks:
   shiny_net:
@@ -9,7 +10,11 @@ networks:
 
 services:
 
-  # ── SERVIDOR ──────────────────────────────────────────────────────────────
+  # =========================================================
+  # 🖥️ PROFILE: pc_1 (A NAVE-MÃE)
+  # Roda o Servidor Central e o Atuador Headless
+  # =========================================================
+
   servidor:
     build:
       context: .
@@ -27,7 +32,6 @@ services:
       TCP_PORT: "${TCP_PORT:-6000}"
     restart: unless-stopped
 
-  # ── ATUADOR ───────────────────────────────────────────────────────────────
   atuador:
     build:
       context: .
@@ -37,16 +41,23 @@ services:
     networks:
       - shiny_net
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      # HARDCODED: Protege o container contra o 'localhost' do .env
+      SERVER_HOST: "servidor"
       TCP_PORT: "${TCP_PORT:-6000}"
-      ARQUIVO: "/data/shinies.json"   # aponta para o volume
+      ARQUIVO: "/data/shinies.json"
     volumes:
-      - ./data:/data                  # bind mount — expõe o JSON ao host (GUI local)
+      - ./data:/data  # A ponte mágica para a GUI ler os shinies
     depends_on:
       servidor:
         condition: service_started
         required: false
     restart: unless-stopped
+
+
+  # =========================================================
+  # 💻 PROFILE: pc_2 (OS TRABALHADORES)
+  # Roda o Gerenciador e os 9 Sensores
+  # =========================================================
 
   gerenciador:
     build:
@@ -59,12 +70,12 @@ services:
     ports:
       - "${CTRL_PORT:-7000}:${CTRL_PORT:-7000}/tcp"
     environment:
-      SERVER_HOST:     "${SERVER_HOST:-servidor}"
-      TCP_PORT:        "${TCP_PORT:-6000}"
-      CTRL_PORT:       "${CTRL_PORT:-7000}"
+      # LÊ DO .ENV: Pega o IP do PC 1 (ex: 192.168.1.45)
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      TCP_PORT: "${TCP_PORT:-6000}"
+      CTRL_PORT: "${CTRL_PORT:-7000}"
       COMPOSE_PROJECT: "${COMPOSE_PROJECT_NAME:-pkmshinysensor}"
     volumes:
-      # Acesso ao Docker daemon do host para controlar containers irmãos
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       servidor:
@@ -72,165 +83,120 @@ services:
         required: false
     restart: unless-stopped
 
-  # ── SENSORES ──────────────────────────────────────────────────────────────
+  # ── SENSORES ─────────────────────────────────────────────
   sensor_gen1:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen1
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "1"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen2:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen2
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "2"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen3:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen3
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "3"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen4:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen4
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "4"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen5:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen5
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "5"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen6:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen6
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "6"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen7:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen7
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "7"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen8:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen8
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "8"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
 
   sensor_gen9:
-    build:
-      context: .
-      dockerfile: Dockerfile.sensor
+    build: { context: ., dockerfile: Dockerfile.sensor }
     container_name: shiny_sensor_gen9
     profiles: ["pc_2"]
-    networks:
-      - shiny_net
+    networks: [shiny_net]
     environment:
       SERVER_HOST: "${SERVER_HOST:-servidor}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "9"
     depends_on:
-      servidor:
-        condition: service_started
-        required: false
+      servidor: { condition: service_started, required: false }
     restart: unless-stopped
