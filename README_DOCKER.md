@@ -31,14 +31,14 @@ Cada instância roda em seu próprio container (computador virtual independente)
 
 ## Como usar
 
-### Subir tudo (servidor + atuador + todos os 9 sensores)
+### Subir tudo 
 ```bash
-docker compose up --build
+docker compose --profile pc_1/pc_2 up --build
 ```
 
-### Subir só alguns sensores
+### Desligar
 ```bash
-docker compose up --build servidor atuador sensor_gen1 sensor_gen3
+docker compose --profile pc_1/pc_2 down
 ```
 
 ### Ver logs de um serviço específico
