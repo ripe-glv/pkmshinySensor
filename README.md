@@ -49,11 +49,11 @@ pkmshinySensor/
 ├── data/
 │   └── shinies.json         # Persistência dos shinies (bind mount)
 ├── docker-compose.yml       # Compose principal (modo single/dual-PC)
-├── docker-compose.lab.yml   # Compose para laboratório com 2 PCs físicos
-├── Dockerfile.servidor
-├── Dockerfile.atuador
-├── Dockerfile.sensor
-├── dockerfile.gerenciador
+├── docker/
+│   ├── Dockerfile.servidor
+│   ├── Dockerfile.atuador
+│   ├── Dockerfile.sensor
+│   └── dockerfile.gerenciador
 ├── requirements.txt
 ├── .env.example
 └── README_DOCKER.md
