@@ -18,7 +18,7 @@ services:
   servidor:
     build:
       context: .
-      dockerfile: Dockerfile.servidor
+      dockerfile: docker/Dockerfile.servidor
     container_name: shiny_servidor
     profiles: ["pc_1"]
     networks:
@@ -35,7 +35,7 @@ services:
   atuador:
     build:
       context: .
-      dockerfile: Dockerfile.atuador
+      dockerfile: docker/Dockerfile.atuador
     container_name: shiny_atuador
     profiles: ["pc_1", "pc_2"]  # O atuador pode rodar em ambos os PCs
     networks:
@@ -61,7 +61,7 @@ services:
   gerenciador:
     build:
       context: .
-      dockerfile: dockerfile.gerenciador
+      dockerfile: docker/dockerfile.gerenciador
     container_name: shiny_gerenciador
     profiles: ["pc_2"]
     networks:
@@ -84,7 +84,7 @@ services:
 
   # ── SENSORES ─────────────────────────────────────────────
   sensor_gen1:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen1
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -97,7 +97,7 @@ services:
     restart: unless-stopped
 
   sensor_gen2:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen2
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -110,7 +110,7 @@ services:
     restart: unless-stopped
 
   sensor_gen3:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen3
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -123,7 +123,7 @@ services:
     restart: unless-stopped
 
   sensor_gen4:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen4
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -136,7 +136,7 @@ services:
     restart: unless-stopped
 
   sensor_gen5:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen5
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -149,7 +149,7 @@ services:
     restart: unless-stopped
 
   sensor_gen6:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen6
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -162,7 +162,7 @@ services:
     restart: unless-stopped
 
   sensor_gen7:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen7
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -175,7 +175,7 @@ services:
     restart: unless-stopped
 
   sensor_gen8:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen8
     profiles: ["pc_2"]
     networks: [shiny_net]
@@ -188,7 +188,7 @@ services:
     restart: unless-stopped
 
   sensor_gen9:
-    build: { context: ., dockerfile: Dockerfile.sensor }
+    build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen9
     profiles: ["pc_2"]
     networks: [shiny_net]
