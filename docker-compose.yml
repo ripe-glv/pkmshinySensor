@@ -42,7 +42,7 @@ services:
       - shiny_net
     environment:
       # HARDCODED: Protege o container contra o 'localhost' do .env
-      SERVER_HOST: "servidor"
+      SERVER_HOST: "${SERVER_HOST:-servidor}"
       TCP_PORT: "${TCP_PORT:-6000}"
       ARQUIVO: "/data/shinies.json"
     volumes:
