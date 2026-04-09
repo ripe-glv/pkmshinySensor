@@ -63,14 +63,14 @@ services:
       context: .
       dockerfile: docker/dockerfile.gerenciador
     container_name: shiny_gerenciador
-    profiles: ["pc_2"]
+    profiles: ["pc_1"]
     networks:
       - shiny_net
     ports:
       - "${CTRL_PORT:-7000}:${CTRL_PORT:-7000}/tcp"
     environment:
       # LÊ DO .ENV: Pega o IP do PC 1 (ex: 192.168.1.45)
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       TCP_PORT: "${TCP_PORT:-6000}"
       CTRL_PORT: "${CTRL_PORT:-7000}"
       COMPOSE_PROJECT: "${COMPOSE_PROJECT_NAME:-pkmshinysensor}"
@@ -89,7 +89,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "1"
     depends_on:
@@ -99,10 +99,10 @@ services:
   sensor_gen2:
     build: { context: ., dockerfile: docker/Dockerfile.sensor }
     container_name: shiny_sensor_gen2
-    profiles: ["pc_2"]
+    profiles: ["pc_1"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "2"
     depends_on:
@@ -115,7 +115,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "3"
     depends_on:
@@ -128,7 +128,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "4"
     depends_on:
@@ -141,7 +141,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "5"
     depends_on:
@@ -154,7 +154,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "6"
     depends_on:
@@ -167,7 +167,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "7"
     depends_on:
@@ -180,7 +180,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "8"
     depends_on:
@@ -193,7 +193,7 @@ services:
     profiles: ["pc_2"]
     networks: [shiny_net]
     environment:
-      SERVER_HOST: "${SERVER_HOST:-servidor}"
+      SERVER_HOST: "${DOCKER_SERVER_HOST:-${SERVER_HOST}}"
       UDP_SERVER_PORT: "${UDP_PORT:-5000}"
       GEN: "9"
     depends_on:
