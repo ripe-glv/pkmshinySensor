@@ -38,13 +38,15 @@ _lock_sensores = threading.Lock()
 
 # ── docker helpers ─────────────────────────────────────────────────────────────
 
+# ── docker helpers ─────────────────────────────────────────────────────────────
+
 def _docker(*args) -> tuple[bool, str]:
-    """Executa docker compose <args>. Retorna (ok, saída)."""
+    """Executa docker puro (sem compose). Retorna (ok, saída)."""
     try:
+        # Removemos o "compose" da lista. Vamos direto no motor do Docker!
         result = subprocess.run(
-            ["docker", "compose"] + list(args),
-            capture_output=True, text=True, timeout=20,
-            env={**os.environ, "COMPOSE_PROJECT_NAME": COMPOSE_PROJECT},
+            ["docker"] + list(args),
+            capture_output=True, text=True, timeout=20
         )
         return result.returncode == 0, (result.stdout + result.stderr).strip()
     except Exception as e:
@@ -53,26 +55,33 @@ def _docker(*args) -> tuple[bool, str]:
 
 def _sensores_ativos() -> list[int]:
     """Retorna lista de gerações com container running."""
-    ok, out = _docker("ps", "--format", "{{.Name}} {{.State}}")
+    # Busca apenas os containers que têm "shiny_sensor_gen" no nome
+    ok, out = _docker("ps", "-a", "--format", "{{.Names}}|{{.State}}", "--filter", "name=shiny_sensor_gen")
     if not ok:
         return []
+    
     gens = []
     for line in out.splitlines():
-        m = re.search(r"sensor_gen(\d+)\s+running", line)
-        if m:
-            gens.append(int(m.group(1)))
+        # A linha virá no formato: shiny_sensor_gen1|running
+        linha_lower = line.lower()
+        if "running" in linha_lower or "up" in linha_lower:
+            m = re.search(r"shiny_sensor_gen(\d+)", linha_lower)
+            if m:
+                gens.append(int(m.group(1)))
     return sorted(gens)
 
 
 def _ativar(gen: int) -> str:
-    ok, out = _docker("start", f"sensor_gen{gen}")
+    # Chama o container diretamente pelo nome que definimos no YAML
+    ok, out = _docker("start", f"shiny_sensor_gen{gen}")
     if ok:
         return f"OK|ATIVADO|{gen}"
     return f"ERRO|ATIVAR|{gen}|{out[:200]}"
 
 
 def _desativar(gen: int) -> str:
-    ok, out = _docker("stop", f"sensor_gen{gen}")
+    # Para o container diretamente pelo nome
+    ok, out = _docker("stop", f"shiny_sensor_gen{gen}")
     if ok:
         return f"OK|DESATIVADO|{gen}"
     return f"ERRO|DESATIVAR|{gen}|{out[:200]}"
