@@ -52,21 +52,34 @@ def _docker(*args) -> tuple[bool, str]:
 
 
 def _sensores_ativos() -> list[int]:
-    """Retorna lista de gerações com container running."""
+    """Retorna lista de gerações com container running.
+    
+    No Linux, o Docker Compose nomeia containers como:
+      <projeto>-sensor_gen<N>-1   (ex: pkmshinysensor-sensor_gen3-1)
+    No Windows/Mac pode ser apenas:
+      sensor_gen<N>
+    O regex abaixo cobre os dois casos.
+    """
     ok, out = _docker("ps", "--format", "{{.Name}} {{.State}}")
     if not ok:
         return []
     gens = []
     for line in out.splitlines():
-        m = re.search(r"sensor_gen(\d+)\s+running", line)
+        # Cobre: "sensor_gen3 running" e "pkmshinysensor-sensor_gen3-1 running"
+        m = re.search(r"sensor_gen(\d+)(?:-\d+)?\s+running", line)
         if m:
             gens.append(int(m.group(1)))
     return sorted(gens)
 
 
 def _ativar(gen: int) -> str:
+    # "docker compose start <serviço>" usa o nome do serviço, não do container
     ok, out = _docker("start", f"sensor_gen{gen}")
     if ok:
+        return f"OK|ATIVADO|{gen}"
+    # Fallback: tenta via docker diretamente pelo nome do container Linux
+    ok2, out2 = _docker_container_cmd("start", gen)
+    if ok2:
         return f"OK|ATIVADO|{gen}"
     return f"ERRO|ATIVAR|{gen}|{out[:200]}"
 
@@ -75,7 +88,32 @@ def _desativar(gen: int) -> str:
     ok, out = _docker("stop", f"sensor_gen{gen}")
     if ok:
         return f"OK|DESATIVADO|{gen}"
+    # Fallback: tenta via docker diretamente pelo nome do container Linux
+    ok2, out2 = _docker_container_cmd("stop", gen)
+    if ok2:
+        return f"OK|DESATIVADO|{gen}"
     return f"ERRO|DESATIVAR|{gen}|{out[:200]}"
+
+
+def _docker_container_cmd(cmd: str, gen: int) -> tuple[bool, str]:
+    """Fallback: chama 'docker <cmd> <container>' para cobrir nomes Linux."""
+    # Tenta os dois padrões de nome possíveis
+    nomes = [
+        f"sensor_gen{gen}",
+        f"{COMPOSE_PROJECT}-sensor_gen{gen}-1",
+        f"{COMPOSE_PROJECT.lower()}-sensor_gen{gen}-1",
+    ]
+    for nome in nomes:
+        try:
+            result = subprocess.run(
+                ["docker", cmd, nome],
+                capture_output=True, text=True, timeout=20,
+            )
+            if result.returncode == 0:
+                return True, result.stdout.strip()
+        except Exception:
+            pass
+    return False, f"container sensor_gen{gen} não encontrado"
 
 
 def _status_msg() -> str:
