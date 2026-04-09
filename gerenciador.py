@@ -2,126 +2,102 @@
 gerenciador_sensores.py
 ───────────────────────
 Atuador gerenciador de sensores — roda em Docker.
-
-Conecta-se ao servidor via TCP (igual ao atuador_headless.py),
-mas em vez de capturar shinies, escuta comandos de controle de sensores.
-
-Protocolo de comandos recebidos do servidor (enviados pela GUI):
-  CMD|ATIVAR|<gen>         → inicia o container sensor_gen<gen>
-  CMD|DESATIVAR|<gen>      → para o container sensor_gen<gen>
-  CMD|STATUS               → responde com a lista de sensores ativos
-
-Protocolo de resposta enviado de volta ao servidor (e repassado à GUI):
-  STATUS_SENSORES|<gen1>,<gen2>,...   → gens atualmente running
-
-Variáveis de ambiente:
-  SERVER_HOST     — hostname do servidor  (padrão: servidor)
-  TCP_PORT        — porta TCP             (padrão: 6000)
-  CTRL_PORT       — porta TCP própria de controle (padrão: 7000)
-  COMPOSE_PROJECT — nome do projeto compose (padrão: pkmshinysensor)
 """
 
 import os
 import re
 import socket
-import subprocess
 import threading
 import time
+
+# IMPORTANTE: Requer 'docker' no requirements.txt
+try:
+    import docker
+except ImportError:
+    print("[Gerenciador] ❌ Biblioteca 'docker' não instalada! Adicione ao requirements.txt e faça o build novamente.")
+    docker = None
 
 SERVER_HOST     = os.environ.get("SERVER_HOST",     "servidor")
 TCP_PORT        = int(os.environ.get("TCP_PORT",    6000))
 CTRL_PORT       = int(os.environ.get("CTRL_PORT",   7000))
-COMPOSE_PROJECT = os.environ.get("COMPOSE_PROJECT", "pkmshinysensor")
 
 _lock_sensores = threading.Lock()
 
+# ── Conexão Direta com a API do Docker do Linux (via Socket) ───────────────────
 
-# ── docker helpers ─────────────────────────────────────────────────────────────
-
-def _docker(*args) -> tuple[bool, str]:
-    """Executa docker compose <args>. Retorna (ok, saída)."""
+def obter_cliente_docker():
+    if not docker: return None
     try:
-        result = subprocess.run(
-            ["docker", "compose"] + list(args),
-            capture_output=True, text=True, timeout=20,
-            env={**os.environ, "COMPOSE_PROJECT_NAME": COMPOSE_PROJECT},
-        )
-        return result.returncode == 0, (result.stdout + result.stderr).strip()
+        # Força o uso do socket do Linux mapeado no docker-compose
+        return docker.DockerClient(base_url='unix://var/run/docker.sock')
     except Exception as e:
-        return False, str(e)
+        print(f"[Gerenciador] ❌ ERRO de Socket: Verifique permissões ou mapeamento de volume: {e}")
+        return None
 
+docker_client = obter_cliente_docker()
+
+# ── docker helpers (Via API Nativa) ────────────────────────────────────────────
+
+def _encontrar_container_gen(gen: int):
+    """Busca o container de uma geração específica independentemente do prefixo."""
+    if not docker_client: return None
+    try:
+        containers = docker_client.containers.list(all=True)
+        for c in containers:
+            # Procura por "sensor_gen1", "shiny_sensor_gen1", "pkmshinysensor-sensor_gen1-1", etc.
+            if f"sensor_gen{gen}" in c.name:
+                return c
+    except Exception as e:
+        print(f"Erro ao buscar container: {e}")
+    return None
 
 def _sensores_ativos() -> list[int]:
-    """Retorna lista de gerações com container running.
-    
-    No Linux, o Docker Compose nomeia containers como:
-      <projeto>-sensor_gen<N>-1   (ex: pkmshinysensor-sensor_gen3-1)
-    No Windows/Mac pode ser apenas:
-      sensor_gen<N>
-    O regex abaixo cobre os dois casos.
-    """
-    ok, out = _docker("ps", "--format", "{{.Name}} {{.State}}")
-    if not ok:
-        return []
-    gens = []
-    for line in out.splitlines():
-        # Cobre: "sensor_gen3 running" e "pkmshinysensor-sensor_gen3-1 running"
-        m = re.search(r"sensor_gen(\d+)(?:-\d+)?\s+running", line)
-        if m:
-            gens.append(int(m.group(1)))
-    return sorted(gens)
-
+    """Retorna lista de gerações com container rodando."""
+    if not docker_client: return []
+    gens = set()
+    try:
+        containers = docker_client.containers.list(all=True)
+        for c in containers:
+            if "sensor_gen" in c.name and c.status in ["running", "up"]:
+                m = re.search(r"sensor_gen(\d+)", c.name)
+                if m:
+                    gens.add(int(m.group(1)))
+    except Exception as e:
+        print(f"Erro ao listar status: {e}")
+    return sorted(list(gens))
 
 def _ativar(gen: int) -> str:
-    # "docker compose start <serviço>" usa o nome do serviço, não do container
-    ok, out = _docker("start", f"sensor_gen{gen}")
-    if ok:
+    if not docker_client: return "ERRO|SEM_DOCKER_API"
+    container = _encontrar_container_gen(gen)
+    
+    if not container:
+        return f"ERRO|NAO_ENCONTRADO|O container da gen {gen} não existe no PC."
+        
+    try:
+        container.start()
         return f"OK|ATIVADO|{gen}"
-    # Fallback: tenta via docker diretamente pelo nome do container Linux
-    ok2, out2 = _docker_container_cmd("start", gen)
-    if ok2:
-        return f"OK|ATIVADO|{gen}"
-    return f"ERRO|ATIVAR|{gen}|{out[:200]}"
-
+    except Exception as e:
+        return f"ERRO|ATIVAR|{gen}|{str(e)[:100]}"
 
 def _desativar(gen: int) -> str:
-    ok, out = _docker("stop", f"sensor_gen{gen}")
-    if ok:
+    if not docker_client: return "ERRO|SEM_DOCKER_API"
+    container = _encontrar_container_gen(gen)
+    
+    if not container:
+        return f"ERRO|NAO_ENCONTRADO|O container da gen {gen} não existe no PC."
+        
+    try:
+        container.stop()
         return f"OK|DESATIVADO|{gen}"
-    # Fallback: tenta via docker diretamente pelo nome do container Linux
-    ok2, out2 = _docker_container_cmd("stop", gen)
-    if ok2:
-        return f"OK|DESATIVADO|{gen}"
-    return f"ERRO|DESATIVAR|{gen}|{out[:200]}"
-
-
-def _docker_container_cmd(cmd: str, gen: int) -> tuple[bool, str]:
-    """Fallback: chama 'docker <cmd> <container>' para cobrir nomes Linux."""
-    # Tenta os dois padrões de nome possíveis
-    nomes = [
-        f"sensor_gen{gen}",
-        f"{COMPOSE_PROJECT}-sensor_gen{gen}-1",
-        f"{COMPOSE_PROJECT.lower()}-sensor_gen{gen}-1",
-    ]
-    for nome in nomes:
-        try:
-            result = subprocess.run(
-                ["docker", cmd, nome],
-                capture_output=True, text=True, timeout=20,
-            )
-            if result.returncode == 0:
-                return True, result.stdout.strip()
-        except Exception:
-            pass
-    return False, f"container sensor_gen{gen} não encontrado"
-
+    except Exception as e:
+        return f"ERRO|DESATIVAR|{gen}|{str(e)[:100]}"
 
 def _status_msg() -> str:
     gens = _sensores_ativos()
     return "STATUS_SENSORES|" + ",".join(str(g) for g in gens)
 
-
 # ── servidor de controle TCP (escuta conexões da GUI / servidor) ───────────────
+# ... (O RESTANTE DO CÓDIGO CONTINUA EXATAMENTE IGUAL) ...
 
 def _tratar_conexao(conn: socket.socket, addr):
     print(f"[Gerenciador] Conexão de controle: {addr}")
@@ -150,17 +126,13 @@ def _tratar_conexao(conn: socket.socket, addr):
             pass
     print(f"[Gerenciador] Conexão encerrada: {addr}")
 
-
 def _processar_cmd(linha: str) -> str | None:
     partes = linha.split("|")
-    if not partes:
-        return None
-
+    if not partes: return None
     tipo = partes[0].upper()
 
     if tipo == "CMD":
-        if len(partes) < 2:
-            return "ERRO|CMD_INVALIDO"
+        if len(partes) < 2: return "ERRO|CMD_INVALIDO"
         acao = partes[1].upper()
 
         if acao == "STATUS":
@@ -172,18 +144,13 @@ def _processar_cmd(linha: str) -> str | None:
             except ValueError:
                 return f"ERRO|GEN_INVALIDO|{partes[2]}"
             with _lock_sensores:
-                if acao == "ATIVAR":
-                    resp = _ativar(gen)
-                else:
-                    resp = _desativar(gen)
-            # Após qualquer mudança, envia status atualizado
+                if acao == "ATIVAR": resp = _ativar(gen)
+                else: resp = _desativar(gen)
             return resp + "\n" + _status_msg()
 
     return f"ERRO|DESCONHECIDO|{linha[:100]}"
 
-
 def loop_controle():
-    """Aceita conexões TCP diretas (da GUI ou do servidor ponte)."""
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     srv.bind(("0.0.0.0", CTRL_PORT))
@@ -193,52 +160,33 @@ def loop_controle():
         conn, addr = srv.accept()
         threading.Thread(target=_tratar_conexao, args=(conn, addr), daemon=True).start()
 
-
-# ── conexão ao servidor principal (para receber CMD encaminhados) ──────────────
-
 def loop_servidor():
-    """
-    Conecta ao servidor TCP como se fosse um atuador normal.
-    O servidor pode repassar mensagens CMD|... vindas da GUI.
-    """
     print(f"[Gerenciador] Conectando ao servidor {SERVER_HOST}:{TCP_PORT}...")
     while True:
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((SERVER_HOST, TCP_PORT))
             print("[Gerenciador] ✅ Conectado ao servidor principal")
-
-            # Identifica-se como gerenciador
             sock.sendall(b"GERENCIADOR_SENSORES\n")
-
             buf = ""
             while True:
                 chunk = sock.recv(4096).decode(errors="replace")
-                if not chunk:
-                    break
+                if not chunk: break
                 buf += chunk
                 while "\n" in buf:
                     linha, buf = buf.split("\n", 1)
                     linha = linha.strip()
-                    if not linha:
-                        continue
+                    if not linha: continue
                     resposta = _processar_cmd(linha)
                     if resposta:
-                        try:
-                            sock.sendall((resposta + "\n").encode())
-                        except Exception:
-                            break
+                        try: sock.sendall((resposta + "\n").encode())
+                        except Exception: break
         except Exception as e:
-            print(f"[Gerenciador] Desconectado do servidor: {e}. Reconectando em 5s...")
+            print(f"[Gerenciador] Desconectado: {e}. Reconectando em 5s...")
         finally:
-            try:
-                sock.close()
-            except Exception:
-                pass
+            try: sock.close()
+            except Exception: pass
         time.sleep(5)
-
-
-# ── heartbeat — loga status periodicamente ────────────────────────────────────
 
 def loop_heartbeat(intervalo: int = 30):
     while True:
@@ -246,17 +194,9 @@ def loop_heartbeat(intervalo: int = 30):
         gens = _sensores_ativos()
         print(f"[Gerenciador] Sensores ativos: {gens if gens else 'nenhum'}")
 
-
-# ── main ───────────────────────────────────────────────────────────────────────
-
 if __name__ == "__main__":
+    if docker_client: print("[Gerenciador] ✅ API do Docker carregada com sucesso!")
     print(f"[Gerenciador] Iniciando | CTRL_PORT:{CTRL_PORT} | SERVER:{SERVER_HOST}:{TCP_PORT}")
-
-    # Servidor de controle local (porta própria)
     threading.Thread(target=loop_controle, daemon=True).start()
-
-    # Heartbeat de status
     threading.Thread(target=loop_heartbeat, daemon=True).start()
-
-    # Conexão ao servidor principal (para receber CMDs encaminhados pela GUI)
-    loop_servidor()   # bloqueia aqui; reconecta automaticamente
+    loop_servidor()
